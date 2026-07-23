@@ -13,9 +13,6 @@ import 'features/auth/ui/login_screen.dart';
 import 'core/network/dio_helper.dart';
 import 'features/home/ui/home_screen.dart';
 import 'core/cache/cache_helper.dart';
-
-import 'firebase_options.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
