@@ -8,7 +8,7 @@ class HomeHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String displayName =
-        context.read<AuthCubit>().userName ?? 'Manar Elhabbal';
+        context.watch<AuthCubit>().userName ?? 'Manar Elhabbal';
 
     return Row(
       children: [

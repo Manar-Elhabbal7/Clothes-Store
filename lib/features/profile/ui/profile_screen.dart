@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../auth/logic/auth_cubit.dart';
 import '../../../core/cache/cache_helper.dart';
 import '../../../core/theme/app_colors.dart';
 
@@ -89,7 +91,7 @@ class ProfileScreen extends StatelessWidget {
               height: 56,
               child: OutlinedButton.icon(
                 onPressed: () async {
-                  await CacheHelper.clearUser();
+                  await context.read<AuthCubit>().logout();
                   if (context.mounted) {
                     Navigator.pushNamedAndRemoveUntil(
                       context,
