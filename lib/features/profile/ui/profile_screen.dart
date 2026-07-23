@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../auth/logic/auth_cubit.dart';
 import '../../../core/cache/cache_helper.dart';
 import '../../../core/theme/app_colors.dart';
@@ -10,8 +11,9 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userName = CacheHelper.getUserName() ?? 'Guest User';
-    final userEmail = '${userName.toLowerCase().replaceAll(' ', '')}@gmail.com';
+    final currentUser = FirebaseAuth.instance.currentUser;
+    final userName = currentUser?.displayName ?? CacheHelper.getUserName() ?? 'Guest User';
+    final userEmail = currentUser?.email ?? 'guest@example.com';
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -44,12 +46,12 @@ class ProfileScreen extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
         child: Column(
           children: [
             // Profile Card Header
             _buildProfileHeader(userName, userEmail),
-            const SizedBox(height: 32),
+            const SizedBox(height: 16),
 
             // Profile Actions List
             _buildActionItem(
@@ -83,12 +85,12 @@ class ProfileScreen extends StatelessWidget {
               onTap: () {},
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
 
             // Logout Button
             SizedBox(
               width: double.infinity,
-              height: 56,
+              height: 48,
               child: OutlinedButton.icon(
                 onPressed: () async {
                   await context.read<AuthCubit>().logout();
@@ -125,15 +127,15 @@ class ProfileScreen extends StatelessWidget {
 
   Widget _buildProfileHeader(String name, String email) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: const [
           BoxShadow(
             color: Colors.black12,
-            blurRadius: 10,
-            offset: Offset(0, 4),
+            blurRadius: 6,
+            offset: Offset(0, 2),
           ),
         ],
       ),
@@ -141,8 +143,8 @@ class ProfileScreen extends StatelessWidget {
         children: [
           // Avatar
           Container(
-            width: 72,
-            height: 72,
+            width: 56,
+            height: 56,
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
@@ -155,7 +157,7 @@ class ProfileScreen extends StatelessWidget {
             child: Text(
               name.isNotEmpty ? name[0].toUpperCase() : 'G',
               style: const TextStyle(
-                fontSize: 28,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: AppColors.primary,
               ),
@@ -199,30 +201,30 @@ class ProfileScreen extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: const [
           BoxShadow(
             color: Colors.black12,
-            blurRadius: 8,
-            offset: Offset(0, 2),
+            blurRadius: 4,
+            offset: Offset(0, 1),
           ),
         ],
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
         leading: Container(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.06),
-            borderRadius: BorderRadius.circular(12),
+            color: Colors.black.withValues(alpha: 0.06),
+            borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(
             icon,
-            color: AppColors.primary,
-            size: 22,
+            color: Colors.black,
+            size: 20,
           ),
         ),
         title: Text(
