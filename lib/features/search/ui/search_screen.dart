@@ -29,32 +29,31 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
+                onPressed: () => Navigator.pop(context),
+              )
+            : null,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          'Search Products',
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+        centerTitle: true,
+      ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  if (Navigator.canPop(context)) ...[
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    const SizedBox(width: 8),
-                  ],
-                  const Text(
-                    'Search Products',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
               CustomSearchBar(
                 controller: _searchController,
                 autofocus: true,
