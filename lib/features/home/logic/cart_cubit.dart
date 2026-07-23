@@ -1,9 +1,32 @@
+import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../core/cache/cache_helper.dart';
 import 'cart_state.dart';
 import 'product_model.dart';
 
 class CartCubit extends Cubit<CartState> {
-  CartCubit() : super(const CartUpdated([]));
+  static const String _keyCartItems = 'cart_items_list';
+
+  CartCubit() : super(const CartUpdated([])) {
+    loadCart();
+  }
+
+  void loadCart() {
+    final list = CacheHelper.getStringList(_keyCartItems);
+    if (list != null) {
+      try {
+        final items = list.map((item) => CartItem.fromJson(jsonDecode(item))).toList();
+        emit(CartUpdated(items));
+      } catch (_) {
+        emit(const CartUpdated([]));
+      }
+    }
+  }
+
+  void _saveCart(List<CartItem> items) {
+    final list = items.map((item) => jsonEncode(item.toJson())).toList();
+    CacheHelper.setStringList(_keyCartItems, list);
+  }
 
   void addItem(Product product, String size, int color) {
     final currentState = state;
@@ -31,6 +54,7 @@ class CartCubit extends Cubit<CartState> {
       }
 
       emit(CartUpdated(updatedItems));
+      _saveCart(updatedItems);
     }
   }
 
@@ -44,6 +68,7 @@ class CartCubit extends Cubit<CartState> {
                i.selectedColor == item.selectedColor
       );
       emit(CartUpdated(updatedItems));
+      _saveCart(updatedItems);
     }
   }
 
@@ -55,6 +80,7 @@ class CartCubit extends Cubit<CartState> {
       if (index != -1) {
         updatedItems[index] = item.copyWith(quantity: item.quantity + 1);
         emit(CartUpdated(updatedItems));
+        _saveCart(updatedItems);
       }
     }
   }
@@ -70,6 +96,7 @@ class CartCubit extends Cubit<CartState> {
         if (index != -1) {
           updatedItems[index] = item.copyWith(quantity: item.quantity - 1);
           emit(CartUpdated(updatedItems));
+          _saveCart(updatedItems);
         }
       }
     }
@@ -77,5 +104,6 @@ class CartCubit extends Cubit<CartState> {
 
   void clearCart() {
     emit(const CartUpdated([]));
+    _saveCart([]);
   }
 }

@@ -27,4 +27,12 @@ class CacheHelper {
     await _sharedPreferences.remove(_keyUserName);
     return await _sharedPreferences.setBool(_keyIsLoggedIn, false);
   }
+
+  static Future<bool> setStringList(String key, List<String> value) async {
+    return await _sharedPreferences.setStringList(key, value);
+  }
+
+  static List<String>? getStringList(String key) {
+    return _sharedPreferences.getStringList(key);
+  }
 }

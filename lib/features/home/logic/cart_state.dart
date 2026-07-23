@@ -28,6 +28,24 @@ class CartItem extends Equatable {
     );
   }
 
+  factory CartItem.fromJson(Map<String, dynamic> json) {
+    return CartItem(
+      product: Product.fromJson(json['product']),
+      quantity: json['quantity'] ?? 1,
+      selectedSize: json['selectedSize'] ?? 'M',
+      selectedColor: json['selectedColor'] ?? 0xff6055D8,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'product': product.toJson(),
+      'quantity': quantity,
+      'selectedSize': selectedSize,
+      'selectedColor': selectedColor,
+    };
+  }
+
   @override
   List<Object?> get props => [product, quantity, selectedSize, selectedColor];
 }

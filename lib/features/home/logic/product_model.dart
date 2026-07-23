@@ -29,7 +29,22 @@ class Product extends Equatable {
       price: (json['price'] as num?)?.toDouble() ?? 0.0,
       description: json['description'] ?? '',
       category: json['category'] ?? '',
+      sizes: json['sizes'] != null ? List<String>.from(json['sizes']) : const ['S', 'M', 'L', 'XL'],
+      colors: json['colors'] != null ? List<int>.from(json['colors']) : const [0xff6055D8, 0xff1A1A1A, 0xffA0A0A0, 0xffE0E0E0],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'image': image,
+      'price': price,
+      'description': description,
+      'category': category,
+      'sizes': sizes,
+      'colors': colors,
+    };
   }
 
   @override
