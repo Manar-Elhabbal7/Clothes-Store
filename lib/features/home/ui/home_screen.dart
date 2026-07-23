@@ -7,9 +7,15 @@ import 'widgets/product_item.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../logic/product_cubit.dart';
 import '../logic/product_state.dart';
+import '../logic/product_model.dart';
+import 'all_products_screen.dart';
+import 'product_details_screen.dart';
+import 'favorites_screen.dart';
 import '../../search/ui/search_screen.dart';
-import '../../shopping_bag/ui/shopping_bag_screen.dart';
 import '../../profile/ui/profile_screen.dart';
+import '../../shopping_bag/ui/shopping_bag_screen.dart';
+import '../logic/cart_cubit.dart';
+import '../logic/cart_state.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -61,7 +67,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   const HomeHeader(),
                   const SizedBox(height: 24),
-                  const CustomSearchBar(),
+                  CustomSearchBar(
+                    readOnly: true,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SearchScreen(),
+                        ),
+                      );
+                    },
+                  ),
                   const SizedBox(height: 24),
                   const DiscountBanner(),
                   const SizedBox(height: 12),
@@ -85,37 +101,53 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  _buildSectionTitle('Featured'),
+                  _buildSectionTitle('Featured', featuredToShow),
                   const SizedBox(height: 16),
                   SizedBox(
-                    height: 220,
+                    height: 200,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: featuredToShow.length,
                       itemBuilder: (context, index) {
                         final product = featuredToShow[index];
-                        return ProductItem(
-                          image: product.image,
-                          name: product.name,
-                          price: '\$${product.price.toStringAsFixed(0)}',
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ProductDetailsScreen(product: product),
+                              ),
+                            );
+                          },
+                          child: ProductItem(
+                            product: product,
+                          ),
                         );
                       },
                     ),
                   ),
                   const SizedBox(height: 24),
-                  _buildSectionTitle('Most Popular'),
+                  _buildSectionTitle('Most Popular', popularToShow),
                   const SizedBox(height: 16),
                   SizedBox(
-                    height: 220,
+                    height: 200,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: popularToShow.length,
                       itemBuilder: (context, index) {
                         final product = popularToShow[index];
-                        return ProductItem(
-                          image: product.image,
-                          name: product.name,
-                          price: '\$${product.price.toStringAsFixed(0)}',
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ProductDetailsScreen(product: product),
+                              ),
+                            );
+                          },
+                          child: ProductItem(
+                            product: product,
+                          ),
                         );
                       },
                     ),
@@ -146,12 +178,30 @@ class _HomeScreenState extends State<HomeScreen> {
           return const SizedBox.shrink();
         },
       ),
-      // Index 1: Search Screen
-      const SearchScreen(),
-      // Index 2: Shopping Bag Screen
-      const ShoppingBagScreen(),
+      // Index 1: Shopping Bag Screen
+      ShoppingBagScreen(
+        onBack: () {
+          setState(() {
+            _currentIndex = 0;
+          });
+        },
+      ),
+      // Index 2: Favorites Screen
+      FavoritesScreen(
+        onBack: () {
+          setState(() {
+            _currentIndex = 0;
+          });
+        },
+      ),
       // Index 3: Profile Screen
-      const ProfileScreen(),
+      ProfileScreen(
+        onBack: () {
+          setState(() {
+            _currentIndex = 0;
+          });
+        },
+      ),
     ];
 
     return Scaffold(
@@ -159,29 +209,64 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SafeArea(
         child: pages[_currentIndex],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: Colors.grey,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
+      bottomNavigationBar: BlocBuilder<CartCubit, CartState>(
+        builder: (context, state) {
+          int cartCount = 0;
+          if (state is CartUpdated) {
+            cartCount = state.totalCount;
+          }
+          return BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
+            selectedItemColor: AppColors.primary,
+            unselectedItemColor: Colors.grey,
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
+            currentIndex: _currentIndex,
+            onTap: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+            items: [
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.home_filled),
+                label: '',
+              ),
+              BottomNavigationBarItem(
+                icon: Badge(
+                  label: Text('$cartCount'),
+                  isLabelVisible: cartCount > 0,
+                  backgroundColor: AppColors.primary,
+                  textColor: Colors.white,
+                  child: const Icon(Icons.shopping_cart_outlined),
+                ),
+                activeIcon: Badge(
+                  label: Text('$cartCount'),
+                  isLabelVisible: cartCount > 0,
+                  backgroundColor: AppColors.primary,
+                  textColor: Colors.white,
+                  child: const Icon(Icons.shopping_cart),
+                ),
+                label: '',
+              ),
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.favorite_border),
+                activeIcon: Icon(Icons.favorite),
+                label: '',
+              ),
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.person_outline),
+                activeIcon: Icon(Icons.person),
+                label: '',
+              ),
+            ],
+          );
         },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_bag_outlined), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: ''),
-        ],
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(String title, List<Product> products) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -193,7 +278,17 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         TextButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AllProductsScreen(
+                  title: title,
+                  products: products,
+                ),
+              ),
+            );
+          },
           child: const Text(
             'See All',
             style: TextStyle(color: AppColors.primary),

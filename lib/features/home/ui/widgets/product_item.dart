@@ -1,51 +1,65 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../logic/favorites_cubit.dart';
+import '../../logic/product_model.dart';
 
-class ProductItem extends StatelessWidget {
-  final String image;
-  final String name;
-  final String price;
+class ProductItem extends StatefulWidget {
+  final Product product;
 
   const ProductItem({
     super.key,
-    required this.image,
-    required this.name,
-    required this.price,
+    required this.product,
   });
 
   @override
+  State<ProductItem> createState() => _ProductItemState();
+}
+
+class _ProductItemState extends State<ProductItem> {
+  @override
   Widget build(BuildContext context) {
+    final isFavorite = context.watch<FavoritesCubit>().isProductFavorite(widget.product);
+
     return Container(
-      width: 140,
+      width: 125,
       margin: const EdgeInsets.only(right: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Stack(
             children: [
-              Container(
-                height: 140,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  image: DecorationImage(
-                    image: NetworkImage(image),
-                    fit: BoxFit.cover,
+              Hero(
+                tag: 'product-image-${widget.product.id}',
+                child: Container(
+                  height: 125,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    image: DecorationImage(
+                      image: NetworkImage(widget.product.image),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
               Positioned(
                 top: 8,
                 right: 8,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Colors.white24,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.favorite_border,
-                    size: 20,
-                    color: Colors.white,
+                child: GestureDetector(
+                  onTap: () {
+                    context.read<FavoritesCubit>().toggleFavorite(widget.product);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: const BoxDecoration(
+                      color: Colors.white70,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      isFavorite ? Icons.favorite : Icons.favorite_border,
+                      size: 16,
+                      color: isFavorite ? Colors.redAccent : Colors.grey[700],
+                    ),
                   ),
                 ),
               ),
@@ -53,7 +67,7 @@ class ProductItem extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            name,
+            widget.product.name,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
@@ -62,7 +76,7 @@ class ProductItem extends StatelessWidget {
             ),
           ),
           Text(
-            price,
+            '\$${widget.product.price.toStringAsFixed(0)}',
             style: const TextStyle(
               color: AppColors.primary,
               fontWeight: FontWeight.bold,

@@ -1,7 +1,20 @@
 import 'package:flutter/material.dart';
 
 class CustomSearchBar extends StatelessWidget {
-  const CustomSearchBar({super.key});
+  final TextEditingController? controller;
+  final VoidCallback? onTap;
+  final ValueChanged<String>? onChanged;
+  final bool readOnly;
+  final bool autofocus;
+
+  const CustomSearchBar({
+    super.key,
+    this.controller,
+    this.onTap,
+    this.onChanged,
+    this.readOnly = false,
+    this.autofocus = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -11,8 +24,13 @@ class CustomSearchBar extends StatelessWidget {
         color: Colors.grey[100],
         borderRadius: BorderRadius.circular(15),
       ),
-      child: const TextField(
-        decoration: InputDecoration(
+      child: TextField(
+        controller: controller,
+        readOnly: readOnly,
+        onTap: onTap,
+        onChanged: onChanged,
+        autofocus: autofocus,
+        decoration: const InputDecoration(
           icon: Icon(Icons.search, color: Colors.grey),
           hintText: 'Search here',
           hintStyle: TextStyle(color: Colors.grey),

@@ -1,6 +1,6 @@
-import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http/http.dart' as http;
+import '../../../core/network/dio_helper.dart';
+import '../../../core/network/app_endpoints.dart';
 import 'product_model.dart';
 import 'product_state.dart';
 
@@ -10,12 +10,10 @@ class ProductCubit extends Cubit<ProductState> {
   Future<void> fetchProducts() async {
     emit(ProductLoading());
     try {
-      final response = await http
-          .get(Uri.parse('https://fakestoreapi.com/products'))
-          .timeout(const Duration(seconds: 8));
+      final response = await DioHelper.getData(url: AppEndpoints.products);
       
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+        final List<dynamic> data = response.data;
         final List<Product> products =
             data.map((json) => Product.fromJson(json)).toList();
         emit(ProductLoaded(products));
